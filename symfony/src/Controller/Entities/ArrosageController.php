@@ -4,13 +4,11 @@ namespace App\Controller\Entities;
 use App\Entity\Arrosage;
 use App\Repository\ArrosageRepository;
 
-use FOS\RestBundle\View\View;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Psr\Log\LoggerInterface;
-
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -45,13 +43,11 @@ class ArrosageController extends AbstractController
 
     /**
      * Retrieves one arrosage
-     * @Route("/onearrosage/{id}", methods={"GET", "POST"})
      */
     public function getOneArrosage(int $id)
     {
-        $entityManager = $this->getDoctrine()->getManager();
         /** @var Arrosage $arrosage */
-        $arrosage = $entityManager->getRepository(Arrosage::class)->findOneByArrosageId($id);
+        $arrosage = $this->arrosageRepository->findOneByArrosageId($id);
 
         if($arrosage) {
 
@@ -76,20 +72,21 @@ class ArrosageController extends AbstractController
 
     }
 
+
+
     /**
      * Retrieves all arrosages
-     * @Route("/allarrosages", methods={"GET", "POST"})
      */
-    public function getAllArrosage()
+    public function getAllArrosages()
     {
-        $entityManager = $this->getDoctrine()->getManager();
+
         /** @var Arrosage $arrosages */
-        $arrosages = $entityManager->getRepository(Arrosage::class)->findAll();
+        $arrosages = $this->arrosageRepository->findAll();
 
         if($arrosages) {
             $this->logger->debug("Il y a " . count($arrosages) . "réseaux d'arrosages." );
 
-            $encoders = [new JsonEncoder()]; // If no need for XmlEncoder
+            $encoders = [new JsonEncoder()];
             $normalizers = [new ObjectNormalizer()];
             $serializer = new Serializer($normalizers, $encoders);
 
@@ -105,7 +102,7 @@ class ArrosageController extends AbstractController
         }else{
             $this->logger->debug("Pas de système d'arrosage trouvé !");
             //return View::create(null, Response::HTTP_NO_CONTENT);
-            return new Response('Pas de système d\'arrosage trouvé');
+            return new Response('Pas de système d\'arrosage trouvé !');
         }
 
     }
